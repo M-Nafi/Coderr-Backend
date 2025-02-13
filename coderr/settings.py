@@ -10,8 +10,6 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
-# from decouple import config
-# from logging import config
 from pathlib import Path
 import os
 
@@ -62,6 +60,7 @@ INSTALLED_APPS = [
     'offers',
     'reviews',
     'user_auth',
+    'django_filters',
 ]
 
 MIDDLEWARE = [
@@ -156,4 +155,4 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
     ],
-    }
+}
