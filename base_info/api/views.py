@@ -7,7 +7,6 @@ from offers.models import Offer
 from rest_framework.permissions import AllowAny
 
 
-
 class BaseInfoView(APIView):
     permission_classes = [AllowAny]
 
