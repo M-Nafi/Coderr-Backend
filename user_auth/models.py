@@ -5,9 +5,9 @@ from django.contrib.auth.models import User
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
     email = models.EmailField(unique=True, error_messages={'unique': "Email existiert bereits."})
-    username = models.CharField(max_length=150, default='Your Name')
-    first_name = models.CharField(max_length=100, default = 'First Name')
-    last_name = models.CharField(max_length=100, default='Last Name')
+    username = models.CharField(max_length=150, default='Nutzername')
+    first_name = models.CharField(max_length=100, default = 'Aktualisiere deinen Namen')
+    last_name = models.CharField(max_length=100, default='Aktualisiere deinen Nachnamen')
     type = models.CharField(max_length=100, choices=[('business', 'business'), ('customer', 'customer')])
     tel = models.CharField(max_length=100, default = '0123456789')
     location = models.CharField(max_length=100, default = 'location')
