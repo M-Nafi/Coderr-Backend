@@ -23,6 +23,12 @@ class Order(models.Model):
     business_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="orders_as_business", verbose_name=('Business User'))
 
     def save(self, *args, **kwargs):
+        """
+        Custom save method for orders.
+
+        If the business user is not set when saving the order, it is set to the user of the offer detail.
+        If the offer detail is set when saving the order, the title, revisions, delivery time in days, price, and features are set to the values of the offer detail if they are not set.
+        """
         if not self.business_user_id and self.offer_detail_id:
             self.business_user = self.offer_detail_id.offer.user
 
@@ -36,5 +42,11 @@ class Order(models.Model):
         super().save(*args, **kwargs)
 
     def update(self, *args, **kwargs):
+        """
+        Updates the order and updates the updated_at field.
+
+        :param args: Additional positional arguments.
+        :param kwargs: Additional keyword arguments.
+        """
         self.updated_at = now()
         super().save(*args, **kwargs)

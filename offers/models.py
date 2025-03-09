@@ -21,10 +21,20 @@ class OfferDetail(models.Model):
     revisions = models.IntegerField(default=-1)  
 
     def round_price(self): 
+        """
+        Rounds the price of the offer detail to two decimal places.
+        This method ensures that the price attribute is rounded to two decimal places
+        if it is not None.
+        """
         if self.price is not None:  
             self.price = round(self.price, 2)  
 
     def save(self, *args, **kwargs): 
+        """
+        Saves the offer detail instance to the database.
+        This method is overridden to round the price of the offer detail to two decimal
+        places before saving it to the database.
+        """
         self.round_price() 
         super().save(*args, **kwargs) 
 

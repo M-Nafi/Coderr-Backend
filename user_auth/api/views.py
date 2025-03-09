@@ -13,6 +13,18 @@ from user_auth.api.serializers import ProfileSerializer, BusinessProfilesListSer
 class RegistrationAPIView(APIView):
     permission_classes = [AllowAny]
     def post(self, request):
+        """
+        Handles POST requests to register a new user.
+
+        If the request is valid, the user is created and a JSON response
+        containing the user's email, username, user_id and an authentication
+        token is returned with a 201 Created status code. If the request is
+        invalid, a JSON response containing the validation errors is returned
+        with a 400 Bad Request status code.
+
+        :param request: The request object.
+        :return: A JSON response containing the user's email, username, user_id and an authentication token or a JSON response containing the validation errors.
+        """
         serializer = RegistrationSerializer(data=request.data)
 
         if serializer.is_valid():
@@ -31,7 +43,18 @@ class RegistrationAPIView(APIView):
 class LoginView(APIView):
     permission_classes = [AllowAny]
     def post(self, request):
-      
+        """
+        Handles POST requests to log in a user.
+
+        This method attempts to authenticate a user with the provided credentials.
+        If the credentials are valid, it returns a JSON response containing the
+        user's id, token, username, and email with a 200 OK status code. If the
+        credentials are invalid, it returns a JSON response containing the validation
+        errors with a 400 Bad Request status code.
+
+        :param request: The HTTP request object containing user credentials.
+        :return: A JSON response with user details and token or validation errors.
+        """
         serializer = LoginSerializer(data=request.data)
         
         if serializer.is_valid():
@@ -45,7 +68,17 @@ class ProfileDetailsAPIView(APIView):
     permission_classes = [AllowAny]
  
     def get(self, request, id):  
-        
+        """
+        Retrieves the profile details for a user with the given ID.
+
+        Fetches the profile associated with the user ID and returns it as a JSON response.
+        The 'uploaded_at' field is omitted from the response data.
+
+        :param request: The incoming request.
+        :param id: The ID of the user whose profile is to be retrieved.
+        :return: A JSON response containing the profile details with a 200 status code.
+        :raises Http404: If the profile does not exist.
+        """
         profile = get_object_or_404(Profile, user__id=id)
         serializer = ProfileSerializer(profile)
         data = serializer.data
@@ -54,7 +87,20 @@ class ProfileDetailsAPIView(APIView):
         return Response(data, status=status.HTTP_200_OK)
  
     def patch(self, request, id, format=None):  
-    
+        """
+        Partially updates the profile details for a user with the given ID.
+
+        This method allows the authenticated user to update specific fields of their profile. 
+        Only the fields specified in 'allowed_fields' can be updated. If any field outside 
+        this list is provided, the request will return a 400 error with details of the invalid fields.
+
+        :param request: The incoming request containing the data to update.
+        :param id: The ID of the user whose profile is to be updated.
+        :param format: The format of the request, default is None.
+        :return: A JSON response containing the updated profile details with a 200 status code.
+                 Returns a 400 status code with error details if the request is invalid.
+        :raises PermissionDenied: If the authenticated user does not own the profile.
+        """
         profile = get_object_or_404(Profile, user__id=id)
         if profile.user != request.user:
             raise PermissionDenied("Dir fehlt die Berechtigung, dieses Profil zu bearbeiten.")
@@ -78,6 +124,23 @@ class ProfileListBusiness(APIView):
     pagination_class = None
 
     def get(self, request):
+        """
+        Returns a list of all business profiles.
+
+        This method returns a JSON response containing a list of business profiles.
+        Each profile is represented by a dictionary with the following keys:
+        - `id`: The ID of the profile.
+        - `user`: A dictionary with the user details.
+        - `type`: The type of the profile (business or customer).
+        - `file`: The path to the profile picture.
+        - `uploaded_at`: The time when the profile picture was uploaded.
+        - `description`: The description of the business.
+        - `working_hours`: The working hours of the business.
+        - `tel`: The phone number of the business.
+        - `location`: The location of the business.
+
+        :return: A JSON response containing the list of business profiles with a 200 status code.
+        """
         profiles = Profile.objects.filter(type='business')
         serializer = BusinessProfilesListSerializer(profiles, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
@@ -88,6 +151,19 @@ class ProfileListCustomers(APIView):
     pagination_class = None
 
     def get(self, request):
+        """
+        Returns a list of all customer profiles.
+
+        This method returns a JSON response containing a list of customer profiles.
+        Each profile is represented by a dictionary with the following keys:
+        - `id`: The ID of the profile.
+        - `user`: A dictionary with the user details.
+        - `type`: The type of the profile (business or customer).
+        - `file`: The path to the profile picture.
+        - `uploaded_at`: The time when the profile picture was uploaded.
+
+        :return: A JSON response containing the list of customer profiles with a 200 status code.
+        """
         profiles = Profile.objects.filter(type='customer')
         serializer = CustomerProfilesListSerializer(profiles, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)

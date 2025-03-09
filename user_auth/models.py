@@ -18,6 +18,18 @@ class Profile(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, blank=True)
     
     def save(self, *args, **kwargs):
+        """
+        Saves the Profile instance.
+
+        This method updates the username field with the user's username before saving.
+        If the profile already exists (i.e., has a primary key), it checks if the file field
+        has been changed. If the file has changed, the uploaded_at field is updated to the
+        current time. Finally, it calls the superclass's save method to save the instance.
+
+        :param args: Additional positional arguments.
+        :param kwargs: Additional keyword arguments.
+        """
+
         self.username = self.user.username
         
         if self.pk:  
@@ -27,4 +39,12 @@ class Profile(models.Model):
         super().save(*args, **kwargs)
  
     def __str__(self):
+        """
+        Returns a string representation of the Profile instance.
+
+        The string representation includes the username of the associated
+        User instance and the value of the type field.
+
+        :return: A string representation of the Profile instance.
+        """
         return f"{self.user.username} - {self.type}"

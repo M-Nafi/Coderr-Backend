@@ -11,6 +11,16 @@ class BaseInfoView(APIView):
     permission_classes = [AllowAny]
 
     def get(self, request, *args, **kwargs):
+        """
+        Handle GET requests to retrieve aggregated statistics.
+
+        This method returns a JSON response containing the following data:
+        - average_rating: The average rating of all reviews, rounded to one decimal place.
+        - business_profile_count: The total number of business profiles.
+        - review_count: The total number of reviews.
+        - offer_count: The total number of offers.
+        """
+
         review_count = Review.objects.count()
         rating_aggregation = Review.objects.aggregate(avg_rating =Avg('rating'))
         average_rating = rating_aggregation.get('avg_rating')

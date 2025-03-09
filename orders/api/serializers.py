@@ -22,6 +22,13 @@ class OrderPostSerializer(serializers.ModelSerializer):
         fields = ['offer_detail_id']  
 
     def create(self, validated_data):
+        """
+        Creates a new order with the given validated data and the user from the request context.
+        
+        :param validated_data: The validated data to create the order with.
+        :raises serializers.ValidationError: If the request context is missing or invalid.
+        :return: The created order instance.
+        """
         request = self.context.get("request")
         if not request or not hasattr(request, "user"):
             raise serializers.ValidationError({"detail": "Request context fehlt oder ungültig."})
@@ -38,6 +45,17 @@ class OrderPatchSerializer(serializers.ModelSerializer):
         fields = ['status']
 
     def update(self, instance, validated_data):
+        """
+        Updates the given order instance with the given validated data.
+
+        This method updates the `status` field of the given order instance with the value
+        provided in the validated data. If the `status` key is not present in the validated
+        data, it does not update the `status` field.
+
+        :param instance: The order instance to update.
+        :param validated_data: The validated data to update the order with.
+        :return: The updated order instance.
+        """
         instance.status = validated_data.get('status', instance.status)
         instance.save()
         return instance
