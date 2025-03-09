@@ -16,8 +16,8 @@ import os
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-MEDIA_URL = '/uploads/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'uploads')
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 
 # Quick-start development settings - unsuitable for production
@@ -56,7 +56,6 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'base_info',
-    'uploads',
     'offers',
     'orders',
     'reviews',

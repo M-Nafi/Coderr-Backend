@@ -71,7 +71,7 @@ class BusinessNotCompletedOrderAPIView(APIView):
         except User.DoesNotExist:
             return Response({"detail": ["Der angegebene Nutzer existiert nicht."]}, status=status.HTTP_404_NOT_FOUND)
         orders = Order.objects.filter(business_user=business_user, status='in_progress')
-        return Response({'order_count': orders.count()}, status=status.HTTP_200_OK)
+        return Response({'order_count': orders.count()})
     
 
 class BusinessCompletedOrderAPIView(APIView):

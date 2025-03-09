@@ -12,7 +12,7 @@ class Profile(models.Model):
     tel = models.CharField(max_length=100, default = '0123456789')
     location = models.CharField(max_length=100, default = 'location')
     description = models.TextField(max_length=1000, default = '')
-    file = models.FileField(blank=True, null=True, upload_to='')
+    file = models.FileField(blank=True, null=True, upload_to='uploads/')
     working_hours = models.CharField(max_length=100, default = '09:00 - 18:00')
     uploaded_at = models.DateTimeField(auto_now=True)
     created_at = models.DateTimeField(auto_now_add=True, blank=True)

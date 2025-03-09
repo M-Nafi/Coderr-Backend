@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from ..models import Profile
 from rest_framework.authtoken.models import Token
 from rest_framework import serializers
+from django.shortcuts import get_object_or_404
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -127,6 +128,11 @@ class ProfileSerializer(serializers.ModelSerializer):
        
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
+            user = instance.user
+            user = get_object_or_404(User, pk=user.id)
+            user.first_name = instance.first_name
+            user.last_name = instance.last_name
+            user.save()
         instance.save()
 
         return instance
