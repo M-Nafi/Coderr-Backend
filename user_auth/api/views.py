@@ -152,18 +152,30 @@ class ProfileListCustomers(APIView):
 
     def get(self, request):
         """
-        Returns a list of all customer profiles.
+        Retrieves a list of all customer profiles.
 
-        This method returns a JSON response containing a list of customer profiles.
-        Each profile is represented by a dictionary with the following keys:
-        - `id`: The ID of the profile.
-        - `user`: A dictionary with the user details.
-        - `type`: The type of the profile (business or customer).
-        - `file`: The path to the profile picture.
-        - `uploaded_at`: The time when the profile picture was uploaded.
+        This method queries the database for profiles with a type of 'customer' and returns
+        them as a JSON response. Each profile includes user details, first and last name,
+        profile picture URL (if available), upload timestamp, and profile type.
 
-        :return: A JSON response containing the list of customer profiles with a 200 status code.
+        :param request: The incoming HTTP request.
+        :return: A JSON response containing a list of customer profiles with a 200 status code.
+                Returns a 500 status code with an error message if an exception occurs.
         """
-        profiles = Profile.objects.filter(type='customer')
-        serializer = CustomerProfilesListSerializer(profiles, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        try:
+            profiles = Profile.objects.filter(type='customer')
+            data = [
+                {
+                    "user": profile.user.id,
+                    "username": profile.user.username,
+                    "first_name": profile.first_name,
+                    "last_name": profile.last_name,
+                    "file": profile.file.url if profile.file else None,
+                    "uploaded_at": profile.uploaded_at,
+                    "type": profile.type,
+                }
+                for profile in profiles
+            ]
+            return Response(data, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
