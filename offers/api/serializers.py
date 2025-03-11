@@ -2,6 +2,7 @@ from rest_framework import serializers
 from django.urls import reverse
 from offers.models import Offer, OfferDetail
 from django.db import models
+from django.shortcuts import get_object_or_404
 
 
 class OfferUrlSerializer(serializers.ModelSerializer):
@@ -147,7 +148,7 @@ class OfferSerializer(serializers.ModelSerializer):
         :param validated_data: The validated data from the request.
         :return: The created offer instance.
         """
-        validated_details = validated_data.pop('validated_details', [])
+        validated_details = validated_data.pop('validated_details')
         offer = Offer.objects.create(**validated_data)
         OfferDetail.objects.bulk_create([OfferDetail(offer=offer, **detail) for detail in validated_details])
         return offer
@@ -332,32 +333,17 @@ class AllOfferDetailsSerializer(serializers.ModelSerializer):
         return instance
 
     def _update_details(self, instance, details_data):
-        """
-        Updates the offer details for the given offer instance.
-
-        This method iterates through the provided `details_data` to update the
-        existing offer details associated with the `instance`. If a detail with
-        a matching ID is found, it updates the existing detail using the
-        `_update_detail_instance` method. If no matching ID is found, it creates
-        a new offer detail. Any existing offer details not present in the
-        `details_data` are deleted.
-
-        :param instance: The offer instance whose details are being updated.
-        :param details_data: A list of dictionaries containing the data for
-                            each detail to update or create.
-        """
 
         existing_details = {detail.id: detail for detail in instance.details.all()}
 
         for detail_data in details_data:
             detail_id = detail_data.get('id')
-            if detail_id and detail_id in existing_details:
-                self._update_detail_instance(existing_details.pop(detail_id), detail_data)
-            else:
-                OfferDetail.objects.create(offer=instance, **detail_data)
 
-        for remaining_detail in existing_details.values():
-            remaining_detail.delete()
+            if detail_id:
+                if detail_id in existing_details:
+                    self._update_detail_instance(existing_details.pop(detail_id), detail_data)
+                else:
+                    continue
 
     def _update_detail_instance(self, detail_instance, detail_data):
         """

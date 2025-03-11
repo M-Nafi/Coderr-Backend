@@ -59,13 +59,13 @@ class LoginView(APIView):
         
         if serializer.is_valid():
             data = {key: serializer.validated_data[key] for key in ["user_id", "token", "username", "email"]}
-            return Response(data, status=status.HTTP_200_OK)
+            return Response(data, status=status.HTTP_201_CREATED)
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
  
 
 class ProfileDetailsAPIView(APIView):
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
  
     def get(self, request, id):  
         """
@@ -116,7 +116,7 @@ class ProfileDetailsAPIView(APIView):
         serializer.is_valid(raise_exception=True)
         serializer.save()
 
-        return Response({**{key: serializer.data[key] for key in data}, "user": id}, status=status.HTTP_200_OK)
+        return Response(serializer.data, status=status.HTTP_200_OK)
  
 
 class ProfileListBusiness(APIView):

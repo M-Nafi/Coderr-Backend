@@ -192,6 +192,8 @@ class ProfileSerializer(serializers.ModelSerializer):
             user = get_object_or_404(User, pk=user.id)
             user.first_name = instance.first_name
             user.last_name = instance.last_name
+            user.location = instance.location
+
             user.save()
         instance.save()
 
@@ -199,11 +201,13 @@ class ProfileSerializer(serializers.ModelSerializer):
 
 
 class BusinessProfilesListSerializer(serializers.ModelSerializer):
-    user=UserSerializer()
     class Meta:
         model = Profile
         fields = [
-            'user', 
+            'user',
+            'username',
+            'first_name',
+            'last_name', 
             'tel',
             'location',
             'type', 
@@ -212,49 +216,13 @@ class BusinessProfilesListSerializer(serializers.ModelSerializer):
             'working_hours', 
         ]
  
-    def to_representation(self, instance):
-        """
-        Customizes the serialized representation of a Profile instance.
-
-        This method modifies the serialized data to include additional fields
-        for the user. Specifically, it renames the 'id' field to 'pk' and
-        updates the 'first_name' and 'last_name' fields with values from the
-        Profile instance.
-
-        :param instance: The Profile instance being serialized.
-        :return: A dictionary representing the serialized data of the instance,
-                with modifications to the user-related fields.
-        """
-        representation = super().to_representation(instance)
-
-        user_representation = representation['user']
-        user_representation['pk'] = user_representation.pop('id')
-        user_representation['first_name'] = instance.first_name
-        user_representation['last_name'] = instance.last_name
-
-        return representation
     
 
 class CustomerProfilesListSerializer(serializers.ModelSerializer):
-    user=UserSerializer()
+
     class Meta:
         model = Profile
         fields = ['user', 'type', 'file', 'uploaded_at']
  
-    def to_representation(self, instance):
-        """
-        Customizes the serialized representation of a Profile instance.
 
-        This method modifies the serialized data to include additional fields
-        for the user. Specifically, it renames the 'id' field to 'pk'.
-
-        :param instance: The Profile instance being serialized.
-        :return: A dictionary representing the serialized data of the instance,
-                with modifications to the user-related fields.
-        """
-        representation = super().to_representation(instance)
-        user_representation = representation['user']
-        user_representation['pk'] = user_representation.pop('id')
-
-        return representation
  
