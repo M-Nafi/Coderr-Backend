@@ -8,10 +8,19 @@ class OrderListSerializer(serializers.ModelSerializer):
     customer_user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
     business_user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
     offer_detail_id = serializers.PrimaryKeyRelatedField(queryset=OfferDetail.objects.all())
+    features = serializers.SerializerMethodField()
     
     class Meta:
         model = Order
-        fields = '__all__'
+        fields = [
+            "id", "customer_user", "business_user", "title", "revisions",
+            "delivery_time_in_days", "price", "features", "offer_type",
+            "status", "created_at", "updated_at"
+        ]
+
+    def get_features(self, obj):
+        return obj.offer_detail_id.features if hasattr(obj.offer_detail_id, 'features') else []
+    
 
 
 class OrderPostSerializer(serializers.ModelSerializer):

@@ -195,7 +195,7 @@ class OfferDetailsAPIView(RetrieveUpdateDestroyAPIView):
         if not self.has_permission_to_delete(request.user, offer):  
             raise PermissionDenied({"detail": "Nur der Ersteller oder ein Admin kann dieses Angebot entfernen."})  
         offer.delete() 
-        return Response({}, status=status.HTTP_200_OK)  
+        return Response({}, status=status.HTTP_204_NO_CONTENT)  
 
     def has_permission_to_delete(self, user, offer):  
         """
