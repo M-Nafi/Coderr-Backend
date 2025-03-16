@@ -70,65 +70,42 @@ class OrderListAPIView(APIView):
 class OrderSingleAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
+    
     def get(self, request, pk):
-        """
-        Returns a single order by its ID.
-
-        The order will be returned with a 200 status code. If the order does not exist, a 404 status code will be returned.
-
-        :param request: The request object.
-        :param pk: The ID of the order to retrieve.
-        :return: The retrieved order with a 200 status code, or a 404 status code if the order does not exist.
-        """
         order = Order.objects.get(pk=pk)
         serializer = OrderListSerializer(order)
         return Response(serializer.data, status=status.HTTP_200_OK)
-    
+
     def patch(self, request, pk):
-        """
-        Updates an existing order with the given data.
-
-        The request body should contain the data to update the order with. The
-        data can be partial, meaning that only the fields provided will be
-        updated.
-
-        Only the creator of the order or an administrator can update the order.
-
-        :param request: The incoming request.
-        :param pk: The ID of the order to update.
-        :return: The updated order with a 200 status code, or a 400 status code if the data is invalid.
-        """
         order = get_object_or_404(Order, pk=pk)
-        is_company = order.business_user == request.user
-        is_admin = request.user.is_staff
-        if not (is_company or is_admin):
-            return Response({"detail": ["Nur der Ersteller oder ein Admin kann diese Aufgabe bearbeiten."]}, status=status.HTTP_403_FORBIDDEN)
-        serializer = OrderPatchSerializer(order, data=request.data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            full_serializer = OrderListSerializer(order)
-            return Response(full_serializer.data, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
+
+        if order.business_user != request.user:
+            return Response({"detail": ["Nur der Business-Nutzer kann den Status einer Bestellung ändern."]}, status=status.HTTP_403_FORBIDDEN)
+
+        status_value = request.data.get('status')
+        if status_value not in ['in_progress', 'completed', 'cancelled']:
+            return Response({"detail": ["Ungültiger Status. Erlaubte Werte: 'in_progress', 'completed', 'cancelled'."]}, status=status.HTTP_400_BAD_REQUEST)
+
+        order.status = status_value
+        order.save()
+
+        full_serializer = OrderListSerializer(order)
+        return Response(full_serializer.data, status=status.HTTP_200_OK)
+
+
     def delete(self, request, pk):
-        """
-        Deletes the order with the given ID.
-
-        Only the creator of the order or an administrator can delete the order.
-
-        :param request: The incoming request.
-        :param pk: The ID of the order to delete.
-        :return: An empty response with a status indicating successful deletion.
-        """
-        if not request.user.is_staff:
-            return Response({"detail": ["Nur der Anbieter oder ein Admin kann dieses löschen."]}, status=status.HTTP_403_FORBIDDEN)
         order = get_object_or_404(Order, pk=pk)
+        
+        if not request.user.is_staff:
+            return Response({"detail": ["Nur Admin-Benutzer können Bestellungen löschen."]}, status=status.HTTP_403_FORBIDDEN)
+        
         order.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
-    
+
+
 
 class BusinessNotCompletedOrderAPIView(APIView):
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [IsAuthenticated]
     def get(self, request, pk):
         """
         Returns the number of non-completed orders for the business user with the given ID.
@@ -152,7 +129,7 @@ class BusinessNotCompletedOrderAPIView(APIView):
     
 
 class BusinessCompletedOrderAPIView(APIView):
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [IsAuthenticated]
     def get(self, request, pk):
         """
         Returns the number of completed orders for the business user with the given ID.

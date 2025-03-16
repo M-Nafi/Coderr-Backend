@@ -13,7 +13,7 @@ class ReviewListAPIView(generics.ListCreateAPIView):
     ordering_fields = ['updated_at', 'rating']
     filterset_fields = ['business_user_id', 'reviewer_id']
     filter_backends = [filters.OrderingFilter, DjangoFilterBackend]
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [permissions.IsAuthenticated]
 
     def get_permissions(self):
         """
