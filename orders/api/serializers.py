@@ -43,7 +43,7 @@ class OrderPostSerializer(serializers.ModelSerializer):
         """
         request = self.context.get("request")
         if not request or not hasattr(request, "user"):
-            raise serializers.ValidationError({"detail": "Request context fehlt oder ungültig."})
+            raise serializers.ValidationError({"detail": ["Request context fehlt oder ungültig."]})
 
         offer_detail = validated_data.get("offer_detail_id")
         title = offer_detail.title if offer_detail else "Unbekanntes Angebot"

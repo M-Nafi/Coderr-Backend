@@ -169,7 +169,7 @@ class ProfileSerializer(serializers.ModelSerializer):
  
         if extra_fields:
             raise serializers.ValidationError(
-                {"detail": f"Das Feld {', '.join(extra_fields)} kann nicht aktualisiert werden. Nur das Feld {', '.join(allowed_fields)} darf aktualisiert werden."}
+                {"detail": [f"Das Feld {', '.join(extra_fields)} kann nicht aktualisiert werden. Nur das Feld {', '.join(allowed_fields)} darf aktualisiert werden."]}
             )
         return attrs
  

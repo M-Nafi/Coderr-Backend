@@ -302,7 +302,7 @@ class AllOfferDetailsSerializer(serializers.ModelSerializer):
                 errors.append(detail_serializer.errors)
 
         if errors:
-            raise serializers.ValidationError({"detail": errors})
+            raise serializers.ValidationError({"detail": [errors]})
 
         attrs['validated_details'] = [
             detail_serializer.validated_data 
